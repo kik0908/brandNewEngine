@@ -35,18 +35,16 @@ class Camera(GameObject):
         self.surface = pygame.display.get_surface()
 
     def update(self):
+        super().update()
         self.surface.fill((0, 0, 0))
 
     def draw(self, game_objects):
         for game_object in game_objects:
             if game_object.has_component(ImageComponent):
-                transform = game_object.transform
-                cam_transform = self.transform
-
                 surface = game_object.get_component(ImageComponent).image
 
-                obj_x, obj_y = transform.coord
-                x, y = cam_transform.coord
+                obj_x, obj_y = game_object.transform.coord
+                x, y = self.transform.coord
 
                 rect = surface.get_rect(
                     centerx=width // 2 + obj_x - x,

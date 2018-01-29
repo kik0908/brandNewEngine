@@ -1,6 +1,6 @@
 from engine.input_manager import input_manager
 from engine.scene_manager import scene_manager
-from engine.base_components import Component, TransformComponent, ImageComponent
+from engine.base_components import Component, ImageComponent
 from engine.game_objects import GameObject
 
 from pygame.math import Vector2
@@ -13,10 +13,11 @@ from time import time
 class ControllerComponent(Component):
     def __init__(self, speed, game_object):
         super().__init__(game_object)
-        self.transform = self.game_object.get_component(TransformComponent)
+        self.transform = self.game_object.transform
         self.speed = speed
         self.sound = pygame.mixer.Sound('sounds/steps.ogg')
-        self._prev_move = Vector2(0, 0)
+        self._prev_move = Vector2()
+        self.rigid_body = self.game_object.get_component(RigidBody)
 
     def get_mouse_coord(self):
         mouse = input_manager.get_mouse_pos()
@@ -31,15 +32,15 @@ class ControllerComponent(Component):
         vert = input_manager.get_axis('Vertical')
         mouse = self.get_mouse_coord()
 
-        delta = Vector2(mouse[0] - self.transform.x, mouse[1] - self.transform.y)
         try:
-            cos = delta.x / delta.length()
-            sin = delta.y / delta.length()
-            rot = degrees(acos(cos))
+            delta = Vector2(mouse[0] - self.transform.x, mouse[1] - self.transform.y).normalize()
+            cos = delta.x
+            sin = delta.y
+            rotation = degrees(acos(cos))
             if sin < 0:
-                rot = -rot
-        except:
-            rot = 0
+                rotation = -rotation
+        except ZeroDivisionError:
+            rotation = 0
 
         move = Vector2(hor, vert)
         if move.length() != 0:
@@ -50,9 +51,14 @@ class ControllerComponent(Component):
             pygame.mixer.Channel(0).stop()
         self._prev_move = move
 
+        prev_rotation = self.transform.rotation
         self.transform.move(move.x, move.y)
-        self.transform.set_rotation(rot)
+        self.transform.set_rotation(rotation)
         scene_manager.current_scene.current_camera.transform.move(move.x, move.y)
+        if self.rigid_body.detect_collision():
+            self.transform.move(-move.x, -move.y)
+            self.transform.set_rotation(prev_rotation)
+            scene_manager.current_scene.current_camera.transform.move(-move.x, -move.y)
 
 
 class ShooterComponent(Component):
@@ -83,3 +89,25 @@ class ShooterComponent(Component):
             else:
                 move = Vector2(1, 0).rotate(bullet.transform.rotation).normalize() * self.speed
                 bullet.transform.move(move.x, move.y)
+
+
+class RigidBody(Component):
+    def __init__(self, game_object):
+        super().__init__(game_object)
+
+    @staticmethod
+    def make_sprite(game_object):
+        spr = pygame.sprite.Sprite()
+        image = game_object.get_component(ImageComponent).image
+        spr.image = image
+        spr.rect = image.get_rect(center=game_object.transform.coord)
+        spr.mask = pygame.mask.from_surface(spr.image)
+        return spr
+
+    def detect_collision(self):
+        objects = list(filter(lambda obj: obj.has_component(RigidBody), scene_manager.current_scene.objects))
+        objects.remove(self.game_object)
+        for obj in objects:
+            if pygame.sprite.collide_mask(RigidBody.make_sprite(self.game_object), RigidBody.make_sprite(obj)):
+                return True
+        return False

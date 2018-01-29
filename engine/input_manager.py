@@ -14,7 +14,6 @@ class InputManager:
     }
 
     def __init__(self):
-        self.subscribers = []
         self.events = []
 
     def get_axis(self, name):

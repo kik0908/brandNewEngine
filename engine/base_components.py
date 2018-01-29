@@ -47,3 +47,8 @@ class ImageComponent(Component):
     @staticmethod
     def load_image(filename):
         return pygame.image.load(filename).convert_alpha()
+
+    ##########################################################
+
+    def set_image(self, image):
+        self._image = image

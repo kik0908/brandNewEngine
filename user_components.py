@@ -50,10 +50,14 @@ class ControllerComponent(Component):
             pygame.mixer.Channel(0).stop()
         self._prev_move = move
 
+        self.move_lenght = move.length()
+
         self.transform.move(move.x, move.y)
         self.transform.set_rotation(rot)
         scene_manager.current_scene.current_camera.transform.move(move.x, move.y)
 
+    def get_vector_len(self):
+        return self.move_lenght
 
 class ShooterComponent(Component):
     def __init__(self, speed, life_time, rate_of_fire, game_object):
@@ -76,6 +80,11 @@ class ShooterComponent(Component):
             self.scene.add_object(bullet)
             self.prev_t = time()
 
+        if pygame.mouse.get_pressed()[0]:
+            self.shooted = 1
+        elif not pygame.mouse.get_pressed()[0]:
+            self.shooted = 0
+
         for bullet, t in self.bullets:
             if time() - t >= self.life_time:
                 self.scene.remove_object(bullet)
@@ -83,3 +92,69 @@ class ShooterComponent(Component):
             else:
                 move = Vector2(1, 0).rotate(bullet.transform.rotation).normalize() * self.speed
                 bullet.transform.move(move.x, move.y)
+
+    def get_shooted(self):
+        return self.shooted
+
+
+class Animation(Component):
+    def __init__(self, images, speed, game_object):
+        super().__init__(game_object)
+        self.speed = self.speed_CONST = speed
+        self.images_rest, self.images, self.images_shot = [], [], []  # List with images
+        try:
+            for _ in range(len(images[0])):
+                self.images_rest.append(pygame.image.load(images[0][_]).convert_alpha())
+        except:
+            self.images_rest = None
+        try:
+            for _ in range(len(images[1])):
+                self.images.append(pygame.image.load(images[1][_]).convert_alpha())
+        except:
+            self.images = None
+        try:
+            for _ in range(len(images[2])):
+                self.images_shot.append(pygame.image.load(images[2][_]).convert_alpha())
+        except:
+            self.images_shot = None
+
+
+
+
+
+class AnimationHuman(Animation):
+    def __init__(self, images, speed, game_object):
+        super().__init__(images, speed, game_object)
+        self.index_rest, self.index_walking = 0, 0
+        self.rest = []
+        self.walking = []
+
+    def update(self):
+        len_vector = self.game_object.get_component(ControllerComponent).get_vector_len()
+        flag_shooted = self.game_object.get_component(ShooterComponent).get_shooted()
+        try:
+            if  len_vector != 0:
+                if self.speed <= 0:
+                    if self.index_walking +1 ==  len(self.images):
+                        self.index_walking = 0
+                    else:
+                        self.index_walking += 1
+                    self.game_object.get_component(ImageComponent).set_image(self.images[self.index_walking])
+                    self.speed = self.speed_CONST
+                self.index_rest = 0
+            else:
+                if self.speed <= 0:
+                    if self.index_rest + 1 == len(self.images_rest):
+                        self.index_rest = 0
+                    else:
+                        self.index_rest += 1
+                    self.speed = self.speed_CONST
+                if flag_shooted:
+                    self.game_object.get_component(ImageComponent).set_image(self.images_shot[0]) #No end
+                else:
+                    self.game_object.get_component(ImageComponent).set_image(self.images_rest[self.index_rest])
+                self.index_walking = 0
+
+            self.speed -= 1
+        except:
+            pass

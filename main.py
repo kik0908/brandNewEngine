@@ -16,16 +16,20 @@ player = GameObject()
 player.add_component(RigidBody(player))
 player.add_component(ControllerComponent(15, player))
 player.add_component(ShooterComponent(50, 3, 0.15, player))
-player.add_component(ImageComponent('images/player.png', False, player))
+player.add_component(ImageComponent('images/player.png', player))
 
 wall = GameObject(500, 500)
 wall.add_component(RigidBody(wall))
-wall.add_component(ImageComponent('images/wall.png', True, wall))
+wall.add_component(ImageComponent('images/wall.png', wall))
+obj = GameObject()
+obj.add_component(ControllerComponent(15, obj))
+obj.add_component(ShooterComponent(50, 3, 0.15, obj))
+obj.add_component(ImageComponent('images/player.png', obj))
 
 for y in range(-8, 8):
     for x in range(-8, 8):
         bg = GameObject(x * 512, y * 512)
-        bg.add_component(ImageComponent('images/bg.png', True, bg))
+        bg.add_component(ImageComponent('images/bg.png', bg))
 
         scene.add_object(bg)
 

@@ -76,7 +76,7 @@ class ShooterComponent(Component):
         if pygame.mouse.get_pressed()[0] and time() - self.prev_t >= self.rate_of_fire:
             pygame.mixer.Channel(1).play(self.sound)
             bullet = GameObject(*self.game_object.transform.coord)
-            bullet.add_component(ImageComponent('images/bullet.png', False, bullet))
+            bullet.add_component(ImageComponent('images/bullet.png', bullet))
             bullet.transform.set_rotation(self.game_object.transform.rotation)
             self.bullets.append((bullet, time()))
             self.scene.add_object(bullet)

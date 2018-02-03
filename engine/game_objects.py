@@ -2,7 +2,6 @@ from engine.base_components import TransformComponent, ImageComponent
 from engine.initialize_engine import width, height
 import pygame
 
-
 class GameObject:
     def __init__(self, x=0, y=0, name='NewObject'):
         self.name = name
@@ -27,6 +26,10 @@ class GameObject:
     def update(self):
         for component in self.components:
             component.update()
+
+    #######################
+    def get_pos(self):
+        return self.transform
 
 
 class Camera(GameObject):

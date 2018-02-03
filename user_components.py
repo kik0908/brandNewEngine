@@ -120,8 +120,6 @@ class Animation(Component):
 
 
 
-
-
 class AnimationHuman(Animation):
     def __init__(self, images, speed, game_object):
         super().__init__(images, speed, game_object)
@@ -158,3 +156,7 @@ class AnimationHuman(Animation):
             self.speed -= 1
         except:
             pass
+
+
+#class Collider(Component):
+#   def

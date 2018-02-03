@@ -16,11 +16,15 @@ input_manager.add_axis('Rotation', {
     pygame.K_e: 1,
 })
 
-obj = GameObject()
-obj.add_component(ControllerComponent(15, obj))
-obj.add_component(ShooterComponent(50, 3, 0.15, obj))
-obj.add_component(ImageComponent('images/player1.png', False, obj))
-obj.add_component(AnimationHuman([['images/player1.png', 'images/player4.png'], ['images/player2.png', 'images/player3.png'], ['images/player1.png']], 10,obj))
+player = GameObject()
+player.add_component(ControllerComponent(15, player))
+player.add_component(ShooterComponent(50, 3, 0.15, player))
+player.add_component(ImageComponent('images/player1.png', False, player))
+player.add_component(AnimationHuman([['images/player1.png', 'images/player4.png'],
+                                     ['images/player2.png', 'images/player3.png'],
+                                     ['images/player1.png']], 10, player))#[Анимация состояния покоя, ходьбы, стрельбы], скорость
+
+
 
 for y in range(-8, 8):
     for x in range(-8, 8):
@@ -29,7 +33,10 @@ for y in range(-8, 8):
 
         scene.add_object(bg)
 
-scene.add_object(obj)
+scene.add_object(player)
+scene.add_object(stena)
+
+
 
 clock = pygame.time.Clock()
 while True:
@@ -40,6 +47,8 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+
+
 
     scene.update()
     scene.render()

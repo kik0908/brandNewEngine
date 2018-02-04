@@ -51,14 +51,19 @@ class ControllerComponent(Component):
             pygame.mixer.Channel(0).stop()
         self._prev_move = move
 
-        prev_rotation = self.transform.rotation
-        self.transform.move(move.x, move.y)
-        self.transform.set_rotation(rotation)
-        scene_manager.current_scene.current_camera.transform.move(move.x, move.y)
-        if self.rigid_body.detect_collision():
-            self.transform.move(-move.x, -move.y)
-            self.transform.set_rotation(prev_rotation)
-            scene_manager.current_scene.current_camera.transform.move(-move.x, -move.y)
+        if not self.rigid_body.detect_collision():
+            self.transform.set_rotation(rotation)
+            self.transform.move(move.x, move.y)
+            scene_manager.current_scene.current_camera.transform.move(move.x, move.y)
+        else:
+            prev_rotation = self.transform.rotation
+            self.transform.move(move.x, move.y)
+            self.transform.set_rotation(rotation)
+            if self.rigid_body.detect_collision():
+                self.transform.move(-move.x, -move.y)
+                self.transform.set_rotation(prev_rotation)
+            else:
+                scene_manager.current_scene.current_camera.transform.move(move.x, move.y)
 
 
 class ShooterComponent(Component):

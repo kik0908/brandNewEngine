@@ -21,10 +21,6 @@ player.add_component(ImageComponent('images/player.png', player))
 wall = GameObject(500, 500)
 wall.add_component(RigidBody(wall))
 wall.add_component(ImageComponent('images/wall.png', wall))
-obj = GameObject()
-obj.add_component(ControllerComponent(15, obj))
-obj.add_component(ShooterComponent(50, 3, 0.15, obj))
-obj.add_component(ImageComponent('images/player.png', obj))
 
 for y in range(-8, 8):
     for x in range(-8, 8):

@@ -1,0 +1,108 @@
+{
+    "name": "house2",
+    "objects": [
+        {
+            "components": [
+                {
+                    "name": "MusicController",
+                    "paths": [
+                        ["sounds/house2_music.ogg", 10]
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "ground_layer",
+            "components": [
+                {
+                    "name": "ImageFile",
+                    "path": "images/interiors/house2/house2.png"
+                }
+            ]
+        },
+        {
+            "name": "player",
+            "x": 20, "y": -220,
+            "components": [
+                {
+                    "name": "AnimationController",
+                    "start_animation": "idle_up",
+                    "animations": {
+                        "up": {"path": "images/player/run_up.png", "size": [1, 4], "repeats": 10},
+                        "down": {"path": "images/player/run_down.png", "size": [1, 4], "repeats": 10},
+                        "right": {"path": "images/player/run_right.png", "size": [1, 4], "repeats": 10},
+                        "left": {"path": "images/player/run_left.png", "size": [1, 4], "repeats": 10},
+
+                        "idle_up": {"path": "images/player/idle_up.png", "size": [1, 1], "repeats": 1},
+                        "idle_down": {"path": "images/player/idle_down.png", "size": [1, 1], "repeats": 1},
+                        "idle_right": {"path": "images/player/idle_right.png", "size": [1, 1], "repeats": 1},
+                        "idle_left": {"path": "images/player/idle_left.png", "size": [1, 1], "repeats": 1}
+                    }
+                },
+                {
+                    "name": "PhysicsCollider",
+                    "rects": [
+                        [0, -24, 30, 15]
+                    ]
+                },
+                {
+                    "name": "TriggerCollider",
+                    "trigger_name": "PlayerTrigger",
+                    "rects": [
+                        [0, -24, 30, 15]
+                    ]
+                },
+                {
+                    "name": "PlayerController",
+                    "speed": 200
+                }
+            ]
+        },
+        {
+            "components": [
+                {
+                    "name": "TriggerCollider",
+                    "trigger_name": "enter_village",
+                    "rects": [
+                        [16, -250, 70, 16]
+                    ]
+                },
+                {
+                    "name": "EnterVillageTrigger"
+                }
+            ]
+        },
+        {
+            "components": [
+                {
+                    "name": "PhysicsCollider",
+                    "rects": [
+                        [16, -264, 600, 20],
+                        [16, 68, 600, 20],
+                        [-260, -80, 20, 500],
+                        [254, -80, 20, 500],
+                        [184, 48, 140, 60],
+                        [228, -220, 32, 70],
+                        [28, -98, 80, 172],
+                        [-106, -208, 10, 60],
+                        [-106, -60, 10, 130],
+                        [-106, 68, 10, 40],
+                        [-188, -61, 160, 40],
+                        [-200, 48, 100, 20],
+                        [-238, -154, 40, 80],
+                        [-184, -248, 140, 20]
+                   ]
+                }
+            ]
+        },
+        {
+            "name": "ground_layer",
+            "components": [
+                {
+                    "name": "ImageFile",
+                    "path": "images/interiors/house2/house_2_2.png"
+                }
+            ]
+        }
+    ]
+}

@@ -1,46 +1,58 @@
-import engine.initialize_engine
+from engine.initialize_engine import Config
+from engine.scene_manager import SceneManager
 
 import pygame
 import sys
 
-from engine.game_objects import GameObject
-from engine.base_components import ImageComponent
-from user_components import ControllerComponent, ShooterComponent
-from engine.scene_manager import scene_manager
-from engine.input_manager import input_manager
+from engine.input_manager import InputManager
+from engine.save_manager import SaveManager
+from engine.gui import GUI
 
-scene_manager.rename_scene('default_scene', 'scene1')
-scene = scene_manager.current_scene
-input_manager.add_axis('Rotation', {
-    pygame.K_q: -1,
-    pygame.K_e: 1,
+from user_components import NetworkingController, ChatController
+from scene_loader import load_scene
+from guis import MainMenuGUI
+
+SaveManager.load_profile('preferences', 'user_prefs.json')
+Config.set_resolution(*SaveManager.get_entry('preferences', 'resolution'))
+Config.set_fullscreen(SaveManager.get_entry('preferences', 'fullscreen'))
+
+GUI.set_cursor(SaveManager.get_entry('config', 'cursor'))
+
+InputManager.set_axis('Horizontal', {
+    SaveManager.get_entry('preferences', 'right'): 1,
+    SaveManager.get_entry('preferences', 'left'): -1,
 })
 
-obj = GameObject()
-obj.add_component(ControllerComponent(15, obj))
-obj.add_component(ShooterComponent(50, 3, 0.15, obj))
-obj.add_component(ImageComponent('images/player.png', obj))
+InputManager.set_axis('Vertical', {
+    SaveManager.get_entry('preferences', 'up'): 1,
+    SaveManager.get_entry('preferences', 'down'): -1,
+})
 
-for y in range(-8, 8):
-    for x in range(-8, 8):
-        bg = GameObject(x * 512, y * 512)
-        bg.add_component(ImageComponent('images/bg.png', bg))
+load_scene('scenes/main_menu.json')
+MainMenuGUI.init()
 
-        scene.add_object(bg)
-
-scene.add_object(obj)
-
-clock = pygame.time.Clock()
 while True:
-    clock.tick(60)
-    input_manager.update()
+    InputManager.update()
 
-    for event in input_manager.get_events():
+    for event in InputManager.get_events():
         if event.type == pygame.QUIT:
+            SaveManager.save_profile('preferences', 'user_prefs.json')
+            for scene in SceneManager.scenes.values():
+                for obj in scene.objects:
+                    for component in obj.get_components(NetworkingController):
+                        component.client.shutdown()
+                    for component in obj.get_components(ChatController):
+                        component.client.shutdown()
+
             pygame.quit()
             sys.exit()
 
-    scene.update()
-    scene.render()
+        GUI.apply_event(event)
+
+    SceneManager.current_scene.update()
+    SceneManager.current_scene.render()
+
+    GUI.update()
+    GUI.render()
 
     pygame.display.flip()

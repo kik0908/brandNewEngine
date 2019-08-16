@@ -1,5 +1,5 @@
 from engine.base_components import TransformComponent, ImageComponent
-from engine.initialize_engine import width, height
+from engine.initialize_engine import Config
 import pygame
 
 
@@ -10,19 +10,22 @@ class GameObject:
         self.add_component(TransformComponent(x, y, self))
         self.transform = self.get_component(TransformComponent)
 
-    def get_component(self, type):
-        for component in self.components:
-            if isinstance(component, type):
-                return component
-
     def add_component(self, component):
         self.components.append(component)
 
-    def has_component(self, type):
-        return self.get_component(type) is not None
+    def get_component(self, type):
+        try:
+            return next(self.get_components(type))
+        except StopIteration:
+            return None
 
     def get_components(self, type):
-        return list(filter(lambda comp: isinstance(comp, type), self.components))
+        for component in self.components:
+            if isinstance(component, type):
+                yield component
+
+    def has_component(self, type):
+        return self.get_component(type) is not None
 
     def update(self):
         for component in self.components:
@@ -35,6 +38,7 @@ class Camera(GameObject):
         self.surface = pygame.display.get_surface()
 
     def update(self):
+        super().update()
         self.surface.fill((0, 0, 0))
 
     def draw(self, game_objects):
@@ -49,8 +53,8 @@ class Camera(GameObject):
                 x, y = cam_transform.coord
 
                 rect = surface.get_rect(
-                    centerx=width // 2 + obj_x - x,
-                    centery=height // 2 + y - obj_y
+                    centerx=Config.get_width() // 2 + obj_x - x,
+                    centery=Config.get_height() // 2 + y - obj_y
                 )
 
                 self.surface.blit(surface, rect)
